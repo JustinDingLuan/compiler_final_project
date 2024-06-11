@@ -61,6 +61,9 @@ int procTop = 0;
 struct procobjTag *procobj = NULL;
 char id[IDLEN];
 char buf[BUFSIZE];
+
+int brace_balance = 0;
+bool multiple_statement = false;
 /*
 ** Error()
 */
@@ -93,7 +96,10 @@ void skip(char follows[], int n)
   {
     Error(n);
     while (follows[token->sym] == 0)
+    {
       token = nextToken();
+    }
+    printf("%s\n", token->value);
   }
 }
 /*
@@ -511,7 +517,7 @@ void Statement()
     }
     else if (strcmp(token->value, "{") == 0)
       CompoundStatement();
-    else if (strcmp(token->value, "While") == 0)
+    else if (strcmp(token->value, "while") == 0)
       WhileStatement();
     else if (strcmp(token->value, "READ") == 0)
       ReadStatement();
@@ -601,17 +607,24 @@ void CompoundStatement()
 {
   if (strcmp(token->value, "{") == 0)
   {
+    brace_balance++;
     token = nextToken();
     Statement();
 
     while (token->sym == symSEMI)
     {
       token = nextToken();
+      printf("%s\n", token->value);
       Statement();
+      if (token == NULL)
+      {
+        Error(29);
+      }
     }
 
     if (strcmp(token->value, "}") == 0)
     {
+      brace_balance--;
       token = nextToken();
     }
     else
@@ -629,7 +642,7 @@ void CompoundStatement()
 /*
 ** 語法規則#11 <IfStatement>
 */
-void IfStatement()
+void IfStatement() // 生成組語感覺要改
 {
   int head, tail;
   if (strcmp(token->value, "if") == 0)
@@ -668,14 +681,26 @@ void IfStatement()
     // printf("%s\n", token->value);
 
     // if是不是有沒有大括號都沒差?
-    bool multiple_statement = false;
+
     if (strcmp(token->value, "{") == 0)
     {
+      brace_balance++;
       multiple_statement = true;
       token = nextToken();
       Statement();
       sprintf(buf, "_go%d:\n", tail);
       fprintf(outfile, buf);
+
+      if (strcmp(token->value, "}") == 0)
+      {
+        brace_balance--;
+        token = nextToken();
+      }
+      else
+      {
+        Error(28);
+        skip(statement, 23);
+      }
     }
     else
     {
@@ -684,53 +709,34 @@ void IfStatement()
       fprintf(outfile, buf);
     }
 
-    // printf("%s\n", token->value);
-
-    if (multiple_statement)
-    {
-      if (strcmp(token->value, "}") != 0)
-      {
-        Error(28);
-        skip(statement, 23);
-      }
-      else
-      {
-        token = nextToken();
-      }
-    }
-
-    multiple_statement = false;
-
+    // 組語要改
     if (strcmp(token->value, "else") == 0)
     {
       tail = ++labelCount;
       token = nextToken();
       if (strcmp(token->value, "{") == 0)
       {
-        multiple_statement = true;
         token = nextToken();
         Statement();
         sprintf(buf, "_go%d:\n", tail);
         fprintf(outfile, buf);
+        printf("%s\n", token->value);
+        if (strcmp(token->value, "}") == 0)
+        {
+          brace_balance--;
+          token = nextToken();
+        }
+        else
+        {
+          Error(28);
+          skip(statement, 23);
+        }
       }
       else
       {
         Statement();
         sprintf(buf, "_go%d:\n", tail);
         fprintf(outfile, buf);
-      }
-
-      if (multiple_statement)
-      {
-        if (strcmp(token->value, "}") != 0)
-        {
-          Error(28);
-          skip(statement, 23);
-        }
-        else
-        {
-          token = nextToken();
-        }
       }
     }
   }
@@ -746,21 +752,50 @@ void IfStatement()
 void WhileStatement()
 {
   int home, head, tail;
-  if (strcmp(token->value, "WHILE") == 0)
+  if (strcmp(token->value, "while") == 0)
   {
+    // printf("%s\n" , token->value);
     token = nextToken();
+    // printf("%s\n" , token->value);
+    if (strcmp(token->value, "(") == 0)
+    {
+      token = nextToken();
+    }
+    else
+    {
+      Error(17);
+      skip(statement, 23);
+    }
+
     home = ++labelCount;
     sprintf(buf, "_go%d:\n", home);
     fprintf(outfile, buf);
+
+    printf("%s\n", token->value);
     Condition();
+
     head = labelCount;
     tail = ++labelCount;
+
     sprintf(buf, "\tJMP\t_go%d\n"
                  "_go%d:\n",
             tail, head);
     fprintf(outfile, buf);
-    if (strcmp(token->value, "DO") == 0)
+
+    if (strcmp(token->value, ")") == 0)
     {
+      token = nextToken();
+    }
+    else
+    {
+      Error(18);
+      skip(statement, 23);
+    }
+
+    multiple_statement = false;
+    if (strcmp(token->value, "{") == 0)
+    {
+      multiple_statement = true;
       token = nextToken();
       Statement();
       sprintf(buf, "\tJMP\t_go%d\n", home);
@@ -768,9 +803,28 @@ void WhileStatement()
     }
     else
     {
-      Error(15);
-      skip(statement, 23);
+      Statement();
+      sprintf(buf, "\tJMP\t_go%d\n", home);
+      fprintf(outfile, buf);
     }
+
+    if (multiple_statement)
+    {
+      if (strcmp(token->value, "}") == 0)
+      {
+        multiple_statement = true;
+        token = nextToken();
+        Statement();
+        sprintf(buf, "\tJMP\t_go%d\n", home);
+        fprintf(outfile, buf);
+      }
+      else
+      {
+        Error(28);
+        skip(statement, 23);
+      }
+    }
+
     sprintf(buf, "_go%d:\n", tail);
     fprintf(outfile, buf);
   }
@@ -949,6 +1003,7 @@ void IdentifierList()
 void Condition()
 {
   Expression();
+
   if (token->sym == symLESS ||
       token->sym == symLEQ ||
       token->sym == symEQ ||
