@@ -15,29 +15,28 @@ void followsyminit()
   factor[symMINUS] = 1;
   factor[symMUL] = 1;
   factor[symDIV] = 1;
-  factor[symEND] = 1;
-  factor[symTHEN] = 1;
-  factor[symDO] = 1;
+  factor[symRBRACE] = 1;
+
   term[symPERIOD] = 1;
   term[symSEMI] = 1;
   term[symRPAREN] = 1;
   term[symPLUS] = 1;
   term[symMINUS] = 1;
-  term[symEND] = 1;
-  term[symTHEN] = 1;
-  term[symDO] = 1;
+  term[symRBRACE] = 1;
+
   expression[symPERIOD] = 1;
   expression[symSEMI] = 1;
   expression[symRPAREN] = 1;
-  expression[symEND] = 1;
-  expression[symTHEN] = 1;
-  expression[symDO] = 1;
-  condition[symTHEN] = 1;
+  expression[symRBRACE] = 1;
+
   condition[symDO] = 1;
+  condition[symRPAREN] = 1;  
+  condition[symRBRACE] = 1;
+
   statement[symPERIOD] = 1;
   statement[symSEMI] = 1;
-  statement[symEND] = 1;
   statement[symRBRACE] = 1;
+
   block[symPERIOD] = 1;
   block[symSEMI] = 1;
 }

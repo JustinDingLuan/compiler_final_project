@@ -1,5 +1,5 @@
 //************ sym.h **************
-#define symSYMMAX 41
+#define symSYMMAX 47
 #define symEOF 0
 #define symerror 1
 #define symIDENTIFIER 2
@@ -41,3 +41,9 @@
 #define symELSE 38
 #define symLBRACE 39
 #define symRBRACE 40
+#define symSTRINGDeclare 41
+#define symLSquareBracket 42
+#define symRSquareBracket 43
+#define symGetAddress 44
+#define symAnd 45
+#define symOr 46

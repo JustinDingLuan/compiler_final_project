@@ -1,5 +1,5 @@
 /************************ err.h **********************/
-#define ERRMAX 29
+#define ERRMAX 38
 char errmsgs[ERRMAX][36] =
     {
         "¥²¶·¸òµÛ¥yÂI.",            /*errmsgs[0] */
@@ -9,19 +9,19 @@ char errmsgs[ERRMAX][36] =
         "¿òº|CONST",                /*errmsgs[4] */
         "¿òº|µ¥¸¹=",                /*errmsgs[5] */
         "¿òº|³r¸¹,©Î¤À¸¹;",         /*errmsgs[6] */
-        "¿òº|VAR",                  /*errmsgs[7] */
+        "¿òº|int",                  /*errmsgs[7] */
         "¿òº|=",                    /*errmsgs[8] */
         "¿òº|CALL",                 /*errmsgs[9] */
         "¿òº|BEGIN",                /*errmsgs[10]*/
         "¿òº|END",                  /*errmsgs[11]*/
-        "¿òº|IF",                   /*errmsgs[12]*/
+        "¿òº|if",                   /*errmsgs[12]*/
         "¿òº|THEN",                 /*errmsgs[12]*/
         "¿òº|WHILE",                /*errmsgs[14]*/
         "WHILE±Ô­z¿ù»~,¿òº|DO",     /*errmsgs[15]*/
-        "¿òº|READ",                 /*errmsgs[16]*/
+        "¿òº|scanf",                /*errmsgs[16]*/
         "¿òº|(",                    /*errmsgs[17]*/
         "¿òº|)",                    /*errmsgs[18]*/
-        "¿òº|WRITE",                /*errmsgs[19]*/
+        "¿òº|printf",               /*errmsgs[19]*/
         "Ãö«Y¹Bºâ¤l¿ù»~",           /*errmsgs[20]*/
         "¿òº|ÃÑ§O¦r",               /*errmsgs[21]*/
         "¿òº|¼Æ¦r",                 /*errmsgs[22]*/
@@ -30,5 +30,15 @@ char errmsgs[ERRMAX][36] =
         "VAR«Å§iÅÜ¼Æ­«½Æ",          /*errmsgs[25]*/
         "ÃÑ§O¦r¨S¦³«Å§i",           /*errmsgs[26]*/
         "¿òº|{",                    /*errmsgs[27]*/
-        "¿òº|}"                     /*errmsgs[28]*/
+        "¿òº|}",                    /*errmsgs[28]*/
+        "Parsing done but not EOF", /*errmsgs[29]*/
+        "¿òº|[",                    /*errmsgs[30]*/
+        "¿òº|]",                    /*errmsgs[31]*/
+        "ÃÑ§O¦rÄÝ©Ê¤£¬Û²Å",         /*errmsgs[32]*/
+        "printf®æ¦¡¿ù»~",           /*errmsgs[33]*/
+        "¿òº|«ü©w¦r¦ê",             /*errmsgs[34]*/
+        "µLªkÃÑ§Oªºtoken",          /*errmsgs[35]*/
+        "scanf®æ¦¡¿ù»~" ,            /*errmsgs[36]*/
+        "¿òº|&"                     /*errmsgs[37]*/
+
 };

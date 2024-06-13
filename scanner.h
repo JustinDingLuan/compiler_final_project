@@ -51,6 +51,7 @@ struct symbolTag *nextToken()
                nextChar >= 'A' && nextChar <= 'Z' ||
                nextChar >= '0' && nextChar <= '9');
       s[n] = '\0';
+
       if (strcmp(s, "if") == 0)
       {
         return newSymbol(symIF, linenum, cp, s);
@@ -66,6 +67,22 @@ struct symbolTag *nextToken()
       else if (strcmp(s, "main") == 0)
       {
         return newSymbol(symMAIN, linenum, cp, s);
+      }
+      else if (strcmp(s, "while") == 0)
+      {
+        return newSymbol(symWHILE, linenum, cp, s);
+      }
+      else if (strcmp(s, "printf") == 0)
+      {
+        return newSymbol(symWRITE, linenum, cp, s);
+      }
+      else if (strcmp(s, "scanf") == 0)
+      {
+        return newSymbol(symREAD, linenum, cp, s);
+      }
+      else if (strcmp(s, "char") == 0)
+      {
+        return newSymbol(symSTRINGDeclare, linenum, cp, s);
       }
 
       return newSymbol(symIDENTIFIER, linenum, cp, s);
@@ -109,6 +126,16 @@ struct symbolTag *nextToken()
         s[n] = '\0';
         advance();
         return newSymbol(symRPAREN, linenum, cp, s);
+      case '[':
+        s[n++] = nextChar;
+        s[n] = '\0';
+        advance();
+        return newSymbol(symLSquareBracket, linenum, cp, s);
+      case ']':
+        s[n++] = nextChar;
+        s[n] = '\0';
+        advance();
+        return newSymbol(symRSquareBracket, linenum, cp, s);
       case '{':
         s[n++] = nextChar;
         s[n] = '\0';
@@ -144,6 +171,41 @@ struct symbolTag *nextToken()
         s[n] = '\0';
         advance();
         return newSymbol(symMOD, linenum, cp, s);
+      case '&':
+        s[n++] = nextChar;
+        s[n] = '\0';
+        advance();
+        if (nextChar == '&')
+        {
+          s[n++] = nextChar;
+          advance();
+          s[n] = '\0';
+          return newSymbol(symAnd, linenum, cp, s);
+        }
+        return newSymbol(symGetAddress, linenum, cp, s);
+      case '|':
+        s[n++] = nextChar;
+        s[n] = '\0';
+        advance();
+        if (nextChar == '|')
+        {
+          s[n++] = nextChar;
+          advance();
+          s[n] = '\0';
+          return newSymbol(symOr, linenum, cp, s);
+        }
+        return newSymbol(symerror, linenum, cp, s);
+      case '!':
+        s[n++] = nextChar;
+        s[n] = '\0';
+        advance();
+        if(nextChar == '='){
+          s[n++] = nextChar;
+          advance();
+          s[n] = '\0';
+          return newSymbol(symNEQ, linenum, cp, s);
+        }
+        return newSymbol(symerror, linenum, cp, s);
       case '=':
         s[n++] = nextChar;
         s[n] = '\0';
@@ -166,14 +228,7 @@ struct symbolTag *nextToken()
           advance();
           s[n] = '\0';
           return newSymbol(symLEQ, linenum, cp, s);
-        }
-        else if (nextChar == '>')
-        {
-          s[n++] = nextChar;
-          advance();
-          s[n] = '\0';
-          return newSymbol(symNEQ, linenum, cp, s);
-        }
+        }        
         else
         {
           return newSymbol(symLESS, linenum, cp, s);
@@ -193,21 +248,21 @@ struct symbolTag *nextToken()
         {
           return newSymbol(symGREATER, linenum, cp, s);
         }
-      case ':':
-        s[n++] = nextChar;
-        s[n] = '\0';
-        advance();
-        if (nextChar == '=')
-        {
-          s[n++] = nextChar;
-          advance();
-          s[n] = '\0';
-          return newSymbol(symBECOMES, linenum, cp, s);
-        }
-        else
-        {
-          return newSymbol(symerror, linenum, cp, s);
-        }
+      // case ':':
+      //   s[n++] = nextChar;
+      //   s[n] = '\0';
+      //   advance();
+      //   if (nextChar == '=')
+      //   {
+      //     s[n++] = nextChar;
+      //     advance();
+      //     s[n] = '\0';
+      //     return newSymbol(symBECOMES, linenum, cp, s);
+      //   }
+      //   else
+      //   {
+      //     return newSymbol(symerror, linenum, cp, s);
+      //   }
       case '"':
         advance();
         while (nextChar != '"')
