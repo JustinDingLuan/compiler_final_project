@@ -18,6 +18,7 @@ void startsyminit()
    statement_start[symSTRINGDeclare] = 1;
    statement_start[symWRITE] = 1;
    statement_start[symREAD] = 1;
+   statement_start[symDO] = 1;
 
    
 }

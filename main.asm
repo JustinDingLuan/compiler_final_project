@@ -34,26 +34,39 @@ main_t	DW	0
 	PUSH	88
 	POP	AX
 	MOV	[main_t], AX
-	PUSH	WORD [main_a]
+main_temp1	DW
+_go2:
+	PUSH	WORD [main_b]
 	PUSH	1
+	POP	BX
+	POP	AX
+	SUB	AX, BX
+	PUSH	AX
+	POP	AX
+	MOV	[main_b], AX
+	itostr	main_b, _intstr, '$'
+	MOV	DX, _intstr
+	MOV	AH, 09H
+	INT	21H
+	newline
+	PUSH	WORD [main_b]
+	PUSH	0
 	POP	BX
 	POP	AX
 	CMP	AX, BX
 	JG	_go2
-	JMP	_go3
-_go2:
+_go3:
+	PUSH	WORD [main_d]
+	PUSH	1
+	POP	BX
+	POP	AX
+	CMP	AX, BX
+	JG	_go4
+	JMP	_go5
+_go4:
 	PUSH	89
 	POP	AX
 	MOV	[main_x], AX
-	PUSH	0
-	POP	AX
-	MOV	[main_w], AX
-	PUSH	10
-	POP	AX
-	MOV	[main_a], AX
-	PUSH	70
-	POP	AX
-	MOV	[main_c], AX
 main_bbcc	DW	0
 	PUSH	77
 	POP	AX
@@ -66,34 +79,24 @@ main_bbcc	DW	0
 	PUSH	AX
 	POP	AX
 	MOV	[main_bbcc], AX
-	JMP	_go4
-_go3:
+	JMP	_go6
+_go5:
 	PUSH	88
 	POP	AX
 	MOV	[main_x], AX
-	PUSH	87
-	POP	AX
-	MOV	[main_w], AX
-	PUSH	9
-	POP	AX
-	MOV	[main_a], AX
-	PUSH	69
-	POP	AX
-	MOV	[main_c], AX
-_go4:
-main_z	DW	0
+_go6:
+	readstr	_buf
+	strtoi	_buf, '$', main_a
+	newline
+_go7:
+	PUSH	WORD [main_a]
 	PUSH	0
-	POP	AX
-	MOV	[main_z], AX
-_go5:
-	PUSH	WORD [main_x]
-	PUSH	80
 	POP	BX
 	POP	AX
 	CMP	AX, BX
-	JG	_go6
-	JMP	_go7
-_go6:
+	JG	_go8
+	JMP	_go9
+_go8:
 	PUSH	WORD [main_x]
 	PUSH	1
 	POP	BX
@@ -107,17 +110,15 @@ _go6:
 	MOV	AH, 09H
 	INT	21H
 	newline
-	itostr	main_w, _intstr, '$'
-	MOV	DX, _intstr
-	MOV	AH, 09H
-	INT	21H
-	newline
-	itostr	main_z, _intstr, '$'
-	MOV	DX, _intstr
-	MOV	AH, 09H
-	INT	21H
-	newline
-	JMP	_go5
-_go7:
+	PUSH	WORD [main_a]
+	PUSH	1
+	POP	BX
+	POP	AX
+	SUB	AX, BX
+	PUSH	AX
+	POP	AX
+	MOV	[main_a], AX
+	JMP	_go7
+_go9:
 	MOV	AX, 4C00H
 	INT	21H

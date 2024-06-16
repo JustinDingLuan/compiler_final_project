@@ -3,7 +3,7 @@
 #define RESWORDMAX 13
 char reswords[RESWORDMAX][10] =
     {
-        "{", "CALL", "CONST", "DO", "END", "if", "PROCEDURE",
+        "{", "CALL", "CONST", "do", "END", "if", "PROCEDURE",
         "PROGRAM", "scanf", "THEN", "VAR", "while", "printf"};
 int isResword(char *s)
 {

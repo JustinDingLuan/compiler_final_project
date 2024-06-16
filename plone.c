@@ -28,9 +28,10 @@ void IdentifierList();
 void Factor();
 void Term();
 void Expression();
-void Condition();
+void Condition(bool is_do_while, int label);
 void WriteStatement();
 void ReadStatement();
+void DO_WHILE_Statement();
 void WhileStatement();
 void IfStatement();
 void CompoundStatement();
@@ -63,8 +64,6 @@ struct procobjTag *procobj = NULL;
 char id[IDLEN];
 char buf[BUFSIZE];
 
-int brace_balance = 0;
-bool multiple_statement = false;
 /*
 ** Error()
 */
@@ -157,7 +156,7 @@ bool ID_EXPRtypecheck(int attr, char *skip_name, int err_num)
 void Program()
 {
   struct procobjTag *p;
-  if (strcmp(token->value, "int") == 0)
+  if (strcmp(token->value, "void") == 0)
   {
     token = nextToken();
     if (strcmp(token->value, "main") == 0)
@@ -482,7 +481,7 @@ void INTDeclaration()
         {
           token = goahead;
         }
-      }      
+      }
     }
     else
     {
@@ -578,7 +577,7 @@ void StringDeclaration()
           return;
         }
 
-        token = nextToken();       
+        token = nextToken();
         if (token->sym == symIDENTIFIER)
         {
           if (ID_IDtypecheck(idobj, statement, 32))
@@ -598,7 +597,7 @@ void StringDeclaration()
       {
         token = goahead;
       }
-      printf("%s %d\n" , token->value , token->sym);
+      printf("%s %d\n", token->value, token->sym);
       while (token->sym == symCOMMA)
       {
         token = nextToken();
@@ -678,10 +677,10 @@ void StringDeclaration()
         else
         {
           Error(26);
-          skip(statement , 23);
+          skip(statement, 23);
           return;
         }
-      }      
+      }
     }
     else
     {
@@ -693,7 +692,7 @@ void StringDeclaration()
   else
   {
     Error(30);
-    skip(statement , 23);
+    skip(statement, 23);
     return;
   }
 }
@@ -703,7 +702,7 @@ void VarDeclaration()
   if (token->sym == symINT)
   {
     printf("進int\n");
-    INTDeclaration();    
+    INTDeclaration();
   }
   else if (token->sym == symSTRINGDeclare)
   {
@@ -719,7 +718,7 @@ void ProcDeclaration()
   int tail;
   char *procid;
   struct procobjTag *p;
-  while (strcmp(token->value, "PROCEDURE") == 0)
+  while (strcmp(token->value, "void") == 0)
   {
     token = nextToken();
     tail = 0;
@@ -771,25 +770,35 @@ void ProcDeclaration()
 ** 語法規則#7 <Statement>
 */
 void Statement()
-{  
+{
   if (isResword(token->value) != -1)
   {
-    if (strcmp(token->value, "if") == 0)
+    if (token->sym == symIF)
     {
       printf("進if\n");
       IfStatement();
     }
-    else if (strcmp(token->value, "{") == 0)
+    else if (token->sym == symLBRACE)
     {
       printf("進compound\n");
       CompoundStatement();
     }
-    else if (strcmp(token->value, "while") == 0)
+    else if (token->sym == symWHILE)
     {
       printf("進while\n");
       WhileStatement();
     }
-    else if (strcmp(token->value, "scanf") == 0)
+    else if(token->sym == symDO){
+      printf("進do_while\n");
+      DO_WHILE_Statement();
+      if (token->sym != symSEMI)
+      {
+        Error(6);
+        skip(statement, 23);
+      }
+      token = nextToken();
+    }
+    else if (token->sym == symREAD)
     {
       printf("進scanf\n");
       ReadStatement();
@@ -800,13 +809,14 @@ void Statement()
       }
       token = nextToken();
     }
-    else if (strcmp(token->value, "printf") == 0)
+    else if (token->sym == symWRITE)
     {
       printf("進printf\n");
       WriteStatement();
-      if(token->sym != symSEMI){
+      if (token->sym != symSEMI)
+      {
         Error(6);
-        skip(statement , 23);
+        skip(statement, 23);
       }
       token = nextToken();
     }
@@ -836,6 +846,12 @@ void Statement()
       Error(6);
       skip(statement, 23);
     }
+    token = nextToken();
+    printf("%s\n" , token->value);
+  }
+  else if (token->sym == symRBRACE)
+  {
+    Error(27);
     token = nextToken();
   }
   else
@@ -892,7 +908,7 @@ void AssignmentStatement()
   {
     Error(8);
     skip(statement, 23);
-  }  
+  }
 }
 /*
 ** 語法規則#9 <CallStatement>
@@ -924,7 +940,7 @@ void CompoundStatement()
   level++;
   if (strcmp(token->value, "{") == 0)
   {
-    token = nextToken();    
+    token = nextToken();
     while (token->sym == symINT || token->sym == symSTRINGDeclare)
     {
       printf("進var\n");
@@ -972,7 +988,8 @@ void IfStatement() // 生成組語感覺要改
     if (strcmp(token->value, "(") == 0)
     {
       token = nextToken();
-      Condition();
+      Condition(false, 0);
+      
       head = labelCount;
       tail = ++labelCount;
       ending = tail;
@@ -1049,8 +1066,8 @@ void WhileStatement()
     if (strcmp(token->value, "(") == 0)
     {
       token = nextToken();
-      
-      Condition();
+
+      Condition(false, 0);
 
       head = labelCount;
       tail = ++labelCount;
@@ -1060,10 +1077,9 @@ void WhileStatement()
               tail, head);
       fprintf(outfile, buf);
 
-      
       if (strcmp(token->value, ")") == 0)
       {
-        token = nextToken();        
+        token = nextToken();
         Statement();
         sprintf(buf, "\tJMP\t_go%d\n", home);
         fprintf(outfile, buf);
@@ -1078,7 +1094,7 @@ void WhileStatement()
     {
       Error(17);
       skip(statement, 23);
-    }    
+    }
 
     sprintf(buf, "_go%d:\n", tail);
     fprintf(outfile, buf);
@@ -1086,6 +1102,63 @@ void WhileStatement()
   else
   {
     Error(14);
+    skip(statement, 23);
+  }
+}
+void DO_WHILE_Statement()
+{
+  int head, tail;
+
+  if (strcmp(token->value, "do") == 0)
+  {
+    head = ++labelCount;
+    sprintf(buf, "_go%d:\n", head);
+    fprintf(outfile, buf);
+
+    token = nextToken();
+    Statement();
+    
+
+    if (token->sym == symWHILE)
+    {
+      token = nextToken();
+      if (strcmp(token->value, "(") == 0)
+      {
+        token = nextToken();
+
+        Condition(true, head);
+
+        
+        tail = ++labelCount;     
+
+        if (strcmp(token->value, ")") == 0)
+        {
+          token = nextToken();          
+        }
+        else
+        {
+          Error(18);
+          skip(statement, 23);
+        }
+      }
+      else
+      {
+        Error(17);
+        skip(statement, 23);
+      }
+
+      sprintf(buf, "_go%d:\n", tail);
+      fprintf(outfile, buf);
+    }
+    else
+    {
+      Error(14);
+      skip(statement, 23);
+    }
+  }
+  else
+  {
+    Error(15);
     skip(statement, 23);
   }
 }
@@ -1098,7 +1171,6 @@ void ReadStatement()
   {
     token = nextToken();
     int num_int = 0, num_specifier = 0, num_id = 0;
-    
 
     if (token->sym == symLPAREN)
     {
@@ -1129,7 +1201,7 @@ void ReadStatement()
               skip(statement, 23);
               return;
             }
-            num_int++;          
+            num_int++;
           }
           // else if (token->value[i] == 's')
           // {
@@ -1152,13 +1224,12 @@ void ReadStatement()
         skip(statement, 23);
         return;
       }
-      
-      printf("%s %d\n", token->value, token->sym);
+
       while (token->sym == symCOMMA)
       {
         token = nextToken();
         // 判斷識別字的屬性是否對應正確
-        if(token->sym == symGetAddress)
+        if (token->sym == symGetAddress)
         {
           token = nextToken();
 
@@ -1169,34 +1240,39 @@ void ReadStatement()
               sprintf(id, "%s_%s",
                       idobj->procname, token->value);
               sprintf(buf, "\treadstr\t_buf\n"
-                            "\tstrtoi\t_buf, '$', %s\n"
-                            "\tnewline\n",id);
+                           "\tstrtoi\t_buf, '$', %s\n"
+                           "\tnewline\n",
+                      id);
               fprintf(outfile, buf);
               num_id++;
             }
-            else{
+            else
+            {
               Error(26);
-              skip(statement , 23);
+              skip(statement, 23);
               return;
             }
             Identifier();
           }
-          else{
+          else
+          {
             Error(21);
-            skip(statement , 23);
+            skip(statement, 23);
             return;
-          }          
+          }
         }
-        else{
+        else
+        {
           Error(37);
-          skip(statement , 23);
+          skip(statement, 23);
           return;
-        }        
+        }
       }
 
-      if(num_id != num_int){
+      if (num_id != num_int)
+      {
         Error(33);
-        skip(statement , 23);
+        skip(statement, 23);
         return;
       }
 
@@ -1223,7 +1299,7 @@ void ReadStatement()
     Error(19);
     skip(statement, 23);
     return;
-  }  
+  }
 }
 
 /*
@@ -1234,7 +1310,7 @@ void WriteStatement()
   if (strcmp(token->value, "printf") == 0)
   {
     token = nextToken();
-    int num_int = 0, num_str = 0, num_specifier = 0 , num_id = 0;
+    int num_int = 0, num_str = 0, num_specifier = 0, num_id = 0;
     int matching[BUFSIZE];
 
     if (token->sym == symLPAREN)
@@ -1280,10 +1356,10 @@ void WriteStatement()
             }
             num_str++;
             matching[num_id] = symSTRING;
-            num_id++;            
+            num_id++;
           }
         }
-        token = nextToken();       
+        token = nextToken();
       }
       else
       {
@@ -1293,17 +1369,19 @@ void WriteStatement()
       }
 
       num_id = 0;
-      
+
       while (token->sym == symCOMMA)
       {
         token = nextToken();
         // 判斷識別字的屬性是否對應正確
         if (token->sym == symIDENTIFIER)
         {
-          if(Check_ID_Exist()){
+          if (Check_ID_Exist())
+          {
             sprintf(id, "%s_%s",
                     idobj->procname, token->value);
-            if(idobj->attr == symINT){
+            if (idobj->attr == symINT)
+            {
               sprintf(buf, "\titostr\t%s, _intstr, '$'\n"
                            "\tMOV\tDX, _intstr\n"
                            "\tMOV\tAH, 09H\n"
@@ -1312,12 +1390,13 @@ void WriteStatement()
                       id);
               fprintf(outfile, buf);
             }
-            else{
+            else
+            {
               sprintf(buf, "\tdispstr\t%s\n", id);
               fprintf(outfile, buf);
             }
           }
-          
+
           Identifier();
         }
 
@@ -1328,31 +1407,35 @@ void WriteStatement()
           return;
         }
 
-        if(idobj->attr != matching[num_id]){
+        if (idobj->attr != matching[num_id])
+        {
           Error(32);
-          skip(statement , 23);
+          skip(statement, 23);
           return;
         }
-        else{
+        else
+        {
           num_id++;
         }
-      } 
+      }
 
-      if(num_id != num_specifier){
+      if (num_id != num_specifier)
+      {
         Error(33);
-        skip(statement , 23);
+        skip(statement, 23);
         return;
       }
 
-      if (token->sym == symRPAREN){
+      if (token->sym == symRPAREN)
+      {
         token = nextToken();
-      }       
+      }
       else
       {
         Error(18);
         skip(statement, 23);
         return;
-      }     
+      }
     }
     else
     {
@@ -1383,7 +1466,7 @@ void IdentifierList()
 /*
 ** 語法規則#16 <Condition>
 */
-void Condition()
+void Condition(bool is_do_while, int label)
 {
   Expression();
 
@@ -1401,32 +1484,65 @@ void Condition()
                  "\tPOP\tAX\n"
                  "\tCMP\tAX, BX\n");
     fprintf(outfile, buf);
-    switch (operator)
+    if (is_do_while)
     {
-    case symEQ:
-      sprintf(buf, "\tJE\t_go%d\n", (++labelCount));
-      fprintf(outfile, buf);
-      break;
-    case symNEQ:
-      sprintf(buf, "\tJNE\t_go%d\n", (++labelCount));
-      fprintf(outfile, buf);
-      break;
-    case symLESS:
-      sprintf(buf, "\tJL\t_go%d\n", (++labelCount));
-      fprintf(outfile, buf);
-      break;
-    case symLEQ:
-      sprintf(buf, "\tJLE\t_go%d\n", (++labelCount));
-      fprintf(outfile, buf);
-      break;
-    case symGREATER:
-      sprintf(buf, "\tJG\t_go%d\n", (++labelCount));
-      fprintf(outfile, buf);
-      break;
-    case symGEQ:
-      sprintf(buf, "\tJGE\t_go%d\n", (++labelCount));
-      fprintf(outfile, buf);
-      break;
+      switch (operator)
+      {
+      case symEQ:
+        sprintf(buf, "\tJE\t_go%d\n", (label));
+        fprintf(outfile, buf);
+        break;
+      case symNEQ:
+        sprintf(buf, "\tJNE\t_go%d\n", (label));
+        fprintf(outfile, buf);
+        break;
+      case symLESS:
+        sprintf(buf, "\tJL\t_go%d\n", (label));
+        fprintf(outfile, buf);
+        break;
+      case symLEQ:
+        sprintf(buf, "\tJLE\t_go%d\n", (label));
+        fprintf(outfile, buf);
+        break;
+      case symGREATER:
+        sprintf(buf, "\tJG\t_go%d\n", (label));
+        fprintf(outfile, buf);
+        break;
+      case symGEQ:
+        sprintf(buf, "\tJGE\t_go%d\n", (label));
+        fprintf(outfile, buf);
+        break;
+      }
+    }
+    else
+    {
+      switch (operator)
+      {
+      case symEQ:
+        sprintf(buf, "\tJE\t_go%d\n", (++labelCount));
+        fprintf(outfile, buf);
+        break;
+      case symNEQ:
+        sprintf(buf, "\tJNE\t_go%d\n", (++labelCount));
+        fprintf(outfile, buf);
+        break;
+      case symLESS:
+        sprintf(buf, "\tJL\t_go%d\n", (++labelCount));
+        fprintf(outfile, buf);
+        break;
+      case symLEQ:
+        sprintf(buf, "\tJLE\t_go%d\n", (++labelCount));
+        fprintf(outfile, buf);
+        break;
+      case symGREATER:
+        sprintf(buf, "\tJG\t_go%d\n", (++labelCount));
+        fprintf(outfile, buf);
+        break;
+      case symGEQ:
+        sprintf(buf, "\tJGE\t_go%d\n", (++labelCount));
+        fprintf(outfile, buf);
+        break;
+      }
     }
   }
   else
@@ -1583,15 +1699,15 @@ int main(int argc, char *argv[])
   }
   fclose(outfile);
   fclose(f);
-  if (errorCount == 0)
-  {
-    FILE *batchfile;
-    sprintf(buf, "%s.bat", progname);
-    batchfile = fopen(buf, "w");
-    fprintf(batchfile, "nasmw %s.asm -o %s.com\n",
-            progname, progname);
-    fprintf(batchfile, "%s.com\n", progname);
-    fclose(batchfile);
-  }
+  // if (errorCount == 0)
+  // {
+  //   FILE *batchfile;
+  //   sprintf(buf, "%s.bat", progname);
+  //   batchfile = fopen(buf, "w");
+  //   fprintf(batchfile, "nasmw %s.asm -o %s.com\n",
+  //           progname, progname);
+  //   fprintf(batchfile, "%s.com\n", progname);
+  //   fclose(batchfile);
+  // }
   return 0;
 }

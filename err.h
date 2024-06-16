@@ -15,9 +15,9 @@ char errmsgs[ERRMAX][36] =
         "¿òº|BEGIN",                /*errmsgs[10]*/
         "¿òº|END",                  /*errmsgs[11]*/
         "¿òº|if",                   /*errmsgs[12]*/
-        "¿òº|THEN",                 /*errmsgs[12]*/
+        "¿òº|THEN",                 /*errmsgs[13]*/
         "¿òº|WHILE",                /*errmsgs[14]*/
-        "WHILE±Ô­z¿ù»~,¿òº|DO",     /*errmsgs[15]*/
+        "do_while±Ô­z¿ù»~,¿òº|do",   /*errmsgs[15]*/
         "¿òº|scanf",                /*errmsgs[16]*/
         "¿òº|(",                    /*errmsgs[17]*/
         "¿òº|)",                    /*errmsgs[18]*/
@@ -39,6 +39,5 @@ char errmsgs[ERRMAX][36] =
         "¿òº|«ü©w¦r¦ê",             /*errmsgs[34]*/
         "µLªkÃÑ§Oªºtoken",          /*errmsgs[35]*/
         "scanf®æ¦¡¿ù»~" ,            /*errmsgs[36]*/
-        "¿òº|&"                     /*errmsgs[37]*/
-
+        "scanf¿òº|&"                 /*errmsgs[37]*/
 };

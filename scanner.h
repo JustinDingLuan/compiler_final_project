@@ -56,6 +56,10 @@ struct symbolTag *nextToken()
       {
         return newSymbol(symIF, linenum, cp, s);
       }
+      else if (strcmp(s, "do") == 0)
+      {
+        return newSymbol(symDO, linenum, cp, s);
+      }
       else if (strcmp(s, "else") == 0)
       {
         return newSymbol(symELSE, linenum, cp, s);
