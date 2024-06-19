@@ -1,5 +1,5 @@
 /************************ err.h **********************/
-#define ERRMAX 38
+#define ERRMAX 43
 char errmsgs[ERRMAX][36] =
     {
         "¥²¶·¸òµÛ¥yÂI.",            /*errmsgs[0] */
@@ -17,7 +17,7 @@ char errmsgs[ERRMAX][36] =
         "¿òº|if",                   /*errmsgs[12]*/
         "¿òº|THEN",                 /*errmsgs[13]*/
         "¿òº|WHILE",                /*errmsgs[14]*/
-        "do_while±Ô­z¿ù»~,¿òº|do",   /*errmsgs[15]*/
+        "do_while±Ô­z¿ù»~,¿òº|do",  /*errmsgs[15]*/
         "¿òº|scanf",                /*errmsgs[16]*/
         "¿òº|(",                    /*errmsgs[17]*/
         "¿òº|)",                    /*errmsgs[18]*/
@@ -38,6 +38,11 @@ char errmsgs[ERRMAX][36] =
         "printf®æ¦¡¿ù»~",           /*errmsgs[33]*/
         "¿òº|«ü©w¦r¦ê",             /*errmsgs[34]*/
         "µLªkÃÑ§Oªºtoken",          /*errmsgs[35]*/
-        "scanf®æ¦¡¿ù»~" ,            /*errmsgs[36]*/
-        "scanf¿òº|&"                 /*errmsgs[37]*/
+        "scanf®æ¦¡¿ù»~",            /*errmsgs[36]*/
+        "scanf¿òº|&",               /*errmsgs[37]*/
+        "¿òº|Function name",        /*errmsgs[38]*/
+        "¿òº|main function",        /*errmsgs[39]*/
+        "«D«Å§iÃöÁä¦r",             /*errmsgs[40]*/
+        "string¶W¥X«Å§iªø«×",       /*errmsgs[41]*/
+        "expressionªí¹F¿ù»~"        /*errmsgs[42]*/
 };

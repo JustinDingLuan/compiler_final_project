@@ -1,3 +1,3 @@
 gcc plone.c -o compiler
-compiler test.c
-nasm main.asm -o main.com
+compiler correct.c
+nasm correct.asm -o correct.com

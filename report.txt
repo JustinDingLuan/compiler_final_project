@@ -1,0 +1,54 @@
+1.	<Program> ::= {<VarDeclaration> ';'} {"void" "FunctionName" '(' ')' <CompoundStatement>} MainFunction '(' ')' <CompoundStatement>
+
+2. <CompoundStatement> ::= '{' { <VarDeclaration> ';'} {<Statement>} '}' 
+
+3. <VarDeclaration> ::= {<IntDeclaration> ';' | <StringDeclaration> ';'}
+
+4.	<IntDeclaration> ::= "int" [<Identifier> | <AssignmentStatement>] {',' [<Identifier> | <AssignmentStatement>]}
+
+5. <StringDeclaration> ::= "char" <Identifier> '[' ']' '=' <String> {',' <Identifier> '[' ']' '=' <String>}
+
+6. <Statement> ::= 
+[
+   <CompoundStatement> 
+   |<AssignmentStatement> ';'
+   |<CallStatement>  
+   |<IfStatement>
+   |<WhileStatement>
+   |<Do_WhileStatement> ';'
+   |<ReadStatement> ';' 
+   |<WriteStatement> ';'
+]
+
+7. <AssignmentStatement> ::= <Identifier> '=' <Expression>
+
+8. <CallStatement> ::= "FunctionName" '(' ')'
+
+9. <IfStatement> ::= "if" '(' <Condition> ')' <Statement> {"else" <Statement>}
+
+10. <WhileStatement> ::= "while" '(' <Condition> ')' <Statement>
+
+11. <Do_WhileStatement>::= "do" <Statement> while '(' <Condition> ')'
+
+12. <ReadStatement> ::= "scanf" '(' ' " ' '%' 'd' {'%' 'd'} ' " ' ',' '&' <Identifier> {',' '&' <Identifier>} ')'
+
+13. <WriteStatement> ::= "printf" '(' ' " ' '%' \'d' | 's'\ {'%' \'d' | 's'\} ' " ' ',' <Identifier> {',' <Identifier>} ')'
+
+14. <Condition> ::= <Expression> \ < | <= | == | != | > | >= \ <Expression>
+
+15. <Expression> ::= [+|-] <Term> {\ + | - \ <Term>}
+
+16. <Term> :: = <Factor> {\ * | / \ <Factor>}
+
+17. <Factor> ::= <Identifier> | <Number> | '(' <Expression> ')'
+
+18. <Identifier> ::= <Alpha> {<Alpha> | <Digit>}
+
+19. <Number> ::= <Digit> {<Digit>}
+
+20. <Alpha> ::= A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|             
+                          a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z
+
+21. <Digit> ::= 0|1|2|3|4|5|6|7|8|9
+
+22. <String> ::= "任何非雙引號的字元集合"

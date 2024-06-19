@@ -10,7 +10,7 @@ char block_start[symSYMMAX];
 void startsyminit()
 {  
 
-   statement_start[symIF] = 1;
+   statement_start[symIF] = 1;   
    statement_start[symINT] = 1;
    statement_start[symWHILE] = 1;
    statement_start[symLBRACE] = 1;
@@ -18,7 +18,5 @@ void startsyminit()
    statement_start[symSTRINGDeclare] = 1;
    statement_start[symWRITE] = 1;
    statement_start[symREAD] = 1;
-   statement_start[symDO] = 1;
-
-   
+   statement_start[symDO] = 1;   
 }

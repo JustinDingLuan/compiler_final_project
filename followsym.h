@@ -5,7 +5,8 @@ char term[symSYMMAX];
 char expression[symSYMMAX];
 char condition[symSYMMAX];
 char statement[symSYMMAX];
-char block[symSYMMAX];
+char function[symSYMMAX];
+char compound[symSYMMAX];
 void followsyminit()
 {
   factor[symPERIOD] = 1;
@@ -37,6 +38,7 @@ void followsyminit()
   statement[symSEMI] = 1;
   statement[symRBRACE] = 1;
 
-  block[symPERIOD] = 1;
-  block[symSEMI] = 1;
+  function[symRBRACE] = 1;
+
+  compound[symRBRACE] = 1;
 }
